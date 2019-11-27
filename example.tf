@@ -38,7 +38,11 @@ resource "aws_instance" "example" {
       "sudo yum -y install git python-pip python-wheel",
       "sudo pip install gunicorn Flask",
       "git clone https://github.com/bugbiteme/os-sample-python-flask.git",
-      "sudo python os-sample-python-flask/wsgi.py &"
+      "sudo cp os-sample-python-flask/service/dummy.service /lib/systemd/system/dummy.service",
+      "sudo systemctl daemon-reload",
+      "sudo systemctl enable dummy.service",
+      "sudo systemctl start dummy.service",
+      "sudo systemctl status dummy.service"
     ]
   }
 
