@@ -5,7 +5,7 @@ provider "aws" {
 
 resource "aws_key_pair" "example" {
   key_name = "pi_key"
-  public_key = file("~/.ssh/pi_key.pub")
+  public_key = file("~/.ssh/id_rsa.pub")
 }
 
 
@@ -29,7 +29,7 @@ resource "aws_instance" "example" {
   connection {
     type        = "ssh"
     user        = "ec2-user"
-    private_key = file("~/.ssh/pi_key.pem")
+    private_key = file("~/.ssh/id_rsa")
     host        = aws_instance.example.public_ip
   }
 
@@ -53,3 +53,25 @@ resource "aws_eip" "ip" {
     vpc = true
     instance = aws_instance.example.id
 }
+
+resource "null_resource" "output_eip" {
+
+  provisioner "local-exec" {
+    command = "echo [web] > eip.txt"
+  }
+
+  provisioner "local-exec" {
+    command = "echo ${aws_eip.ip.public_ip} >> eip.txt"
+  }
+
+  provisioner "local-exec" {
+    command = "lynx ${aws_eip.ip.public_ip} -dump"
+  }
+
+}
+
+
+output "ip" {
+  value = aws_eip.ip.public_ip
+}
+
